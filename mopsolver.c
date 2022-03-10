@@ -17,12 +17,16 @@
 #define BLOCKED  '#'
 #define PASSABLE '.'
 
+#define MAX_FILENAME 100
+
 /// Main function for this program. Takes in flag command-line arguments
 ///  and solves a maze according to specified parameters.
 ///
 /// @param argv  The number of given arguments
 /// @param argc  An array of pointers to each argument
 int main( int argv, char* argc[] ){
+    char infile[MAX_FILENAME] = "";
+    char outfile[MAX_FILENAME] = "";
     int d, s, p;
     int opt;
     while( ( opt = getopt( argv, argc, "hdspi:o:" ) ) != -1 ){
@@ -40,8 +44,10 @@ int main( int argv, char* argc[] ){
                 p = 1;
                 break;
             case 'i':
+                strcpy( infile, optarg );
                 break;
             case 'o':
+                strcpy( outfile, optarg );
                 break;
             default:
                 print_help_stderr();
@@ -60,6 +66,15 @@ int main( int argv, char* argc[] ){
     if( p == 1 ){
         printf( "Print the path, if it exists\n" );
     }
+
+    if( strcmp( infile, "" ) != 0 ){
+        printf( "An infile was provided: %s\n", infile );
+    }
+
+    if( strcmp( outfile, "" ) != 0 ){
+        printf( "An outfile was provided: %s\n", outfile );
+    }
+
     return EXIT_SUCCESS;
 }
 
