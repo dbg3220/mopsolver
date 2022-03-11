@@ -54,6 +54,8 @@ int main( int argv, char* argc[] ){
                 return EXIT_SUCCESS;
         }
     }
+    FILE * input;
+    FILE * output;
 
     if( d == 1 ){
         printf( "Display the initial maze\n" );
@@ -68,11 +70,27 @@ int main( int argv, char* argc[] ){
     }
 
     if( strcmp( infile, "" ) != 0 ){
-        printf( "An infile was provided: %s\n", infile );
+        printf( "An infile was provided: %s\n", infile );//returns NULL if unable to open file
+        input = fopen( infile, "r" );
+    }else{
+        input = stdin;
     }
 
     if( strcmp( outfile, "" ) != 0 ){
         printf( "An outfile was provided: %s\n", outfile );
+        output = fopen( outfile, "w" );
+    }else{
+        output = stdout;
+    }
+
+    //TODO somewhere in here solve the maze
+    
+    if( strcmp( infile, "" ) == 0 ){
+        fclose( input );
+    }
+
+    if( strcmp( outfile, "" ) == 0 ){
+        fclose( output );
     }
 
     return EXIT_SUCCESS;
