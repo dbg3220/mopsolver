@@ -11,14 +11,17 @@
 
 #include "print_help.h"
 
+///Prints help to stdout
 void print_help_stdout(){
     fprintf( stdout, HELP );
 }
 
+///Prints help to stderr
 void print_help_stderr(){
     fprintf( stderr, HELP );
 }
 
+///Pretty prints a maze
 void pretty_print( int rows, int cols, char path[rows][cols] ){
     printf( "|" );
     for( int i = 0; i < cols * 2 + 1; i++ ){
