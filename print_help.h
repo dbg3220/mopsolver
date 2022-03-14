@@ -1,7 +1,7 @@
 //
 // File: simple_graph.h
 // Description: functions and defined error message string for printing errors
-//  in the mopsolver program
+//  and pretty-printing a maze
 //
 // @author Damon Gonzalez
 //
@@ -32,6 +32,13 @@ void print_help_stdout();
 
 /// Prints the standard usage message to standard error
 void print_help_stderr();
+
+/// Pretty-prints a maze
+///
+/// @param rows  The amount of rows in the maze
+/// @param cols  The amount of columns in the maze
+/// @param path  The path through the maze as a char matrix
+void pretty_print( int rows, int cols, char path[rows][cols] );
 
 #endif
 
