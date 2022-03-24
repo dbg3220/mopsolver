@@ -27,18 +27,17 @@
                 "  -o outfile  Write all output to outfile.                  "\
                 "  (Default: stdout)\n"\
 
-/// Prints the standard usage message to standard output
-void print_help_stdout();
-
-/// Prints the standard usage message to standard error
-void print_help_stderr();
+/// Prints HELP to a provided output stream
+///
+/// @param  The stream to print to
+void fprint_help( FILE * output );
 
 /// Pretty-prints a maze
 ///
 /// @param rows  The amount of rows in the maze
 /// @param cols  The amount of columns in the maze
 /// @param path  The path through the maze as a char matrix
-void pretty_print( int rows, int cols, char path[rows][cols] );
+void pretty_print( int rows, int cols, char ** path );
 
 #endif
 
