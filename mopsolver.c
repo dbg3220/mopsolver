@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include <stdbool.h> //temporary
+#include <stdbool.h>
 #include <assert.h>
 
 #include "QueueADT.h"
@@ -95,14 +95,6 @@ int solve( int rows, int cols, char ** maze ){
             break;
         }
         Cell child;
-        if( current_row != 0 && 
-            !visited[current_row - 1][current_col] &&
-            maze[current_row - 1][current_col] != BLOCKED ){
-            visited[current_row - 1][current_col] = true;
-            child = create_cell( current_row - 1, current_col, current );
-            que_insert( queue, child );
-            que_insert( all_cells, child );
-        }
         if( current_row != rows - 1 && 
             !visited[current_row + 1][current_col] &&
             maze[current_row + 1][current_col] != BLOCKED ){
@@ -111,18 +103,27 @@ int solve( int rows, int cols, char ** maze ){
             que_insert( queue, child );
             que_insert( all_cells, child );
         }
+         if( current_col != cols - 1 &&
+            !visited[current_row][current_col + 1] &&
+            maze[current_row][current_col + 1] != BLOCKED ){
+            visited[current_row][current_col + 1] = true;
+            child = create_cell( current_row, current_col + 1, current );
+            que_insert( queue, child );
+            que_insert( all_cells, child );
+        }
+        if( current_row != 0 && 
+            !visited[current_row - 1][current_col] &&
+            maze[current_row - 1][current_col] != BLOCKED ){
+            visited[current_row - 1][current_col] = true;
+            child = create_cell( current_row - 1, current_col, current );
+            que_insert( queue, child );
+            que_insert( all_cells, child );
+        }
         if( current_col != 0 && 
             !visited[current_row][current_col - 1] &&
             maze[current_row][current_col - 1] != BLOCKED ){
             visited[current_row][current_col - 1] = true;
             child = create_cell( current_row, current_col - 1, current );
-            que_insert( queue, child );
-            que_insert( all_cells, child );
-        }
-        if( current_col != cols - 1 &&
-            !visited[current_row][current_col + 1] &&
-            maze[current_row][current_col + 1] != BLOCKED ){
-            child = create_cell( current_row, current_col + 1, current );
             que_insert( queue, child );
             que_insert( all_cells, child );
         }
@@ -161,29 +162,42 @@ int get_columns( char * line ){
     return cols;
 }
 
-/// Parse a QueueADT of C strings into a char matrix and deletes the queue from
-///  memory.
+/// Takes a file stream as input and parses a text representation of a maze
+///  into a matrix of chars.
 ///
-/// @param queue  The queue of strings that represent the mazes
-/// @param int rows  The amount of rows in the maze
-/// @param int cols  The amount of cols in the maze
-/// @param maze  The char matrix that will be modified to represent the maze
-/// 
-/// @postcondition queue is empty
-void parse( QueueADT queue, int cols, char ** maze ){
-    int current_row = 0;
-    while( !que_empty( queue ) ){
-        char * line = (char*)que_remove( queue );
-        for( int i = 0; i < cols; i++ ){
+/// @param input  The stream that the maze will be received from
+/// @param rows  A pointer to an int that will be set to the amount of rows in
+///  the maze
+/// @param cols  A pointer to an int that will be set to the amount of columns
+///  in the maze
+/// @param maze  A double pointer char that this function will parse the maze
+///  into
+void parse( FILE * input, int * rows, int * cols, char *** maze ){
+    int size = 0;
+    (*maze) = (char**)malloc( sizeof( char* ) * size );
+    char * buf = NULL;
+    size_t n = 0;
+    while( getline( &buf, &n, input ) != -1 ){
+        char * line = (char*)malloc( sizeof( char ) * ( strlen( buf ) + 1 ) );
+        strcpy( line, buf );
+        size++;
+        int columns = get_columns( line );
+        if( size == 1 ){
+            *cols = columns;
+        }
+        *maze = (char**)realloc( *maze, sizeof( char * ) * size ); 
+        (*maze)[size - 1] = (char*)malloc( sizeof( char ) * columns );
+        for( int i = 0; i < columns; i++ ){
             if( line[i * 2] == '0' ){
-                maze[current_row][i] = PASSABLE;
+                (*maze)[size - 1][i] = PASSABLE;
             }else{
-                maze[current_row][i] = BLOCKED;
+                (*maze)[size - 1][i] = BLOCKED;
             }
         }
         free( line );
-        current_row++;
     }
+    free( buf );
+    *rows = size;
 }
 
 /// Main function for this program. Takes in flag command-line arguments
@@ -245,27 +259,10 @@ int main( int argv, char* argc[] ){
     
     assert( input != NULL );
     
-    QueueADT lines = que_create( NULL );
-    char * buf = NULL;
-    size_t n = 0;
-    while( getline( &buf, &n, input ) > 0 ){
-        char * line = (char*)malloc( sizeof( char ) * ( strlen( buf ) + 1 ) );
-        strcpy( line, buf );
-        line[strlen(line) - 1] = '\0';
-        que_insert( lines, (void*)line );
-    }
-    int rows = (int)que_size( lines );
-    int cols = get_columns( buf );
-    free( buf );
+    int rows, cols;
+    char ** maze = NULL;
+    parse( input, &rows, &cols, &maze );
 
-    char ** maze;
-    maze = (char**)malloc( sizeof( char* ) * rows );
-    for( int i = 0; i < rows; i++ ){
-        maze[i] = (char*)malloc( sizeof( char ) * cols );
-    }
-    parse( lines, cols, maze );
-    que_destroy( lines );
-    
     if( display ){
         pretty_print( rows, cols, maze );
     }
