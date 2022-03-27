@@ -80,18 +80,17 @@ int solve( int rows, int cols, char ** maze ){
             visited[i][j] = false;
         }
     }
-    QueueADT all_cells = que_create( NULL );
+    QueueADT processed_cells = que_create( NULL );
     QueueADT queue = que_create( NULL );
-    que_insert( all_cells, entrance );
     que_insert( queue, entrance );
     while( !que_empty( queue ) ){
         Cell current = (Cell)que_remove( queue );
+        que_insert( processed_cells, current );
         short current_row = current->row;
         short current_col = current->column;
         if( current_row == rows - 1 && current_col == cols - 1 ){
             solution = current;
             destroy_matrix( rows, (void**)visited );
-            que_destroy( queue );
             break;
         }
         Cell child;
@@ -101,7 +100,6 @@ int solve( int rows, int cols, char ** maze ){
             visited[current_row + 1][current_col] = true;
             child = create_cell( current_row + 1, current_col, current );
             que_insert( queue, child );
-            que_insert( all_cells, child );
         }
          if( current_col != cols - 1 &&
             !visited[current_row][current_col + 1] &&
@@ -109,7 +107,6 @@ int solve( int rows, int cols, char ** maze ){
             visited[current_row][current_col + 1] = true;
             child = create_cell( current_row, current_col + 1, current );
             que_insert( queue, child );
-            que_insert( all_cells, child );
         }
         if( current_row != 0 && 
             !visited[current_row - 1][current_col] &&
@@ -117,7 +114,6 @@ int solve( int rows, int cols, char ** maze ){
             visited[current_row - 1][current_col] = true;
             child = create_cell( current_row - 1, current_col, current );
             que_insert( queue, child );
-            que_insert( all_cells, child );
         }
         if( current_col != 0 && 
             !visited[current_row][current_col - 1] &&
@@ -125,7 +121,6 @@ int solve( int rows, int cols, char ** maze ){
             visited[current_row][current_col - 1] = true;
             child = create_cell( current_row, current_col - 1, current );
             que_insert( queue, child );
-            que_insert( all_cells, child );
         }
     }
     if( solution != NULL ){
@@ -136,11 +131,16 @@ int solve( int rows, int cols, char ** maze ){
            current = current->ancestor;
            steps++;
         }
-        while( !que_empty( all_cells ) ){
-            Cell cell = (Cell)que_remove( all_cells );
+        while( !que_empty( queue ) ){
+            Cell cell = (Cell)que_remove( processed_cells );
             free( cell );
         }
-        que_destroy( all_cells );
+        que_destroy( queue );
+        while( !que_empty( processed_cells ) ){
+            Cell cell = (Cell)que_remove( processed_cells );
+            free( cell );
+        }
+        que_destroy( processed_cells );
         return steps;      
     }else{
         return -1;
@@ -173,31 +173,35 @@ int get_columns( char * line ){
 /// @param maze  A double pointer char that this function will parse the maze
 ///  into
 void parse( FILE * input, int * rows, int * cols, char *** maze ){
-    int size = 0;
+    int size = 120;
+    int count = 0;
     (*maze) = (char**)malloc( sizeof( char* ) * size );
     char * buf = NULL;
     size_t n = 0;
     while( getline( &buf, &n, input ) != -1 ){
         char * line = (char*)malloc( sizeof( char ) * ( strlen( buf ) + 1 ) );
+        count++;
         strcpy( line, buf );
-        size++;
         int columns = get_columns( line );
-        if( size == 1 ){
+        if( count == 1 ){
             *cols = columns;
         }
-        *maze = (char**)realloc( *maze, sizeof( char * ) * size ); 
-        (*maze)[size - 1] = (char*)malloc( sizeof( char ) * columns );
+        if( count > size ){
+            size = size * 2;
+            *maze = (char**)realloc( *maze, sizeof( char * ) * size ); 
+        }
+        (*maze)[count - 1] = (char*)malloc( sizeof( char ) * columns );
         for( int i = 0; i < columns; i++ ){
             if( line[i * 2] == '0' ){
-                (*maze)[size - 1][i] = PASSABLE;
+                (*maze)[count - 1][i] = PASSABLE;
             }else{
-                (*maze)[size - 1][i] = BLOCKED;
+                (*maze)[count - 1][i] = BLOCKED;
             }
         }
         free( line );
     }
     free( buf );
-    *rows = size;
+    *rows = count;
 }
 
 /// Main function for this program. Takes in flag command-line arguments
@@ -262,6 +266,8 @@ int main( int argv, char* argc[] ){
     int rows, cols;
     char ** maze = NULL;
     parse( input, &rows, &cols, &maze );
+    //printf( "The maze has %d rows and %d columns\n", rows, cols );
+    printf( "The maze has been parsed into memory\n" );
 
     if( display ){
         pretty_print( rows, cols, maze );
