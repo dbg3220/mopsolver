@@ -28,8 +28,8 @@
 /// Structure representing a cell for use in the breadth-first search algorithm
 typedef struct Cell_H {
     struct Cell_H * ancestor;
-    short row;
-    short column;
+    unsigned short row;
+    unsigned short column;
 } * Cell;
 
 /// Destroys a char matrix allocated on the heap
@@ -50,7 +50,7 @@ void destroy_matrix( int rows, void ** matrix ){
 /// @param row  The row of the cell to create
 /// @param col  The column of the cell to create
 /// @return A pointer to the created cell
-Cell create_cell( short row, short column, Cell ancestor ){
+Cell create_cell( unsigned short row, unsigned short column, Cell ancestor ){
     Cell cell = (Cell)malloc( sizeof( struct Cell_H ) );
     cell->ancestor = ancestor;
     cell->row = row;
@@ -68,8 +68,6 @@ Cell create_cell( short row, short column, Cell ancestor ){
 /// @return The amount of moves taken to solve the maze, -1 if a solution does
 ///  not exist
 int solve( int rows, int cols, char ** maze ){
-    Cell entrance = create_cell( 0, 0, NULL );
-    Cell solution = NULL;
     bool ** visited;
     visited = (bool**)malloc( sizeof( bool* ) * rows );
     for( int i = 0; i < rows; i++ ){
@@ -82,15 +80,18 @@ int solve( int rows, int cols, char ** maze ){
     }
     QueueADT processed_cells = que_create( NULL );
     QueueADT queue = que_create( NULL );
-    que_insert( queue, entrance );
+    if( maze[0][0] == PASSABLE ){
+        Cell entrance = create_cell( 0, 0, NULL );
+        que_insert( queue, entrance );
+    }
+    Cell solution = NULL;
     while( !que_empty( queue ) ){
         Cell current = (Cell)que_remove( queue );
         que_insert( processed_cells, current );
-        short current_row = current->row;
-        short current_col = current->column;
+        unsigned short current_row = current->row;
+        unsigned short current_col = current->column;
         if( current_row == rows - 1 && current_col == cols - 1 ){
             solution = current;
-            destroy_matrix( rows, (void**)visited );
             break;
         }
         Cell child;
@@ -132,7 +133,7 @@ int solve( int rows, int cols, char ** maze ){
            steps++;
         }
         while( !que_empty( queue ) ){
-            Cell cell = (Cell)que_remove( processed_cells );
+            Cell cell = (Cell)que_remove( queue );
             free( cell );
         }
         que_destroy( queue );
@@ -141,6 +142,7 @@ int solve( int rows, int cols, char ** maze ){
             free( cell );
         }
         que_destroy( processed_cells );
+        destroy_matrix( rows, (void**)visited );
         return steps;      
     }else{
         return -1;
@@ -175,7 +177,7 @@ int get_columns( char * line ){
 void parse( FILE * input, int * rows, int * cols, char *** maze ){
     int size = 120;
     int count = 0;
-    (*maze) = (char**)malloc( sizeof( char* ) * size );
+    *maze = (char**)malloc( sizeof( char* ) * size );
     char * buf = NULL;
     size_t n = 0;
     while( getline( &buf, &n, input ) != -1 ){
@@ -266,8 +268,6 @@ int main( int argv, char* argc[] ){
     int rows, cols;
     char ** maze = NULL;
     parse( input, &rows, &cols, &maze );
-    //printf( "The maze has %d rows and %d columns\n", rows, cols );
-    printf( "The maze has been parsed into memory\n" );
 
     if( display ){
         pretty_print( rows, cols, maze );
