@@ -270,20 +270,20 @@ int main( int argv, char* argc[] ){
     parse( input, &rows, &cols, &maze );
 
     if( display ){
-        pretty_print( rows, cols, maze );
+        fpretty_print( output, rows, cols, maze );
     }
 
     int steps = solve( rows, cols, maze ); 
 
     if( path_size ){
         if( steps == -1 ){
-            printf( "No solution.\n" );
+            fprintf( output, "No solution.\n" );
         }else{
-            printf( "Solution in %d steps.\n", steps );
+            fprintf( output, "Solution in %d steps.\n", steps );
         }
     }
     if( path ){
-        pretty_print( rows, cols, maze );
+        fpretty_print( output, rows, cols, maze );
     }
 
     destroy_matrix( rows, (void**)maze );

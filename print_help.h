@@ -37,7 +37,7 @@ void fprint_help( FILE * output );
 /// @param rows  The amount of rows in the maze
 /// @param cols  The amount of columns in the maze
 /// @param path  The path through the maze as a char matrix
-void pretty_print( int rows, int cols, char ** path );
+void fpretty_print( FILE * stream, int rows, int cols, char ** path );
 
 #endif
 

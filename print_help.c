@@ -17,33 +17,33 @@ void fprint_help( FILE * output ){
 }
 
 /// Pretty prints a maze
-void pretty_print( int rows, int cols, char ** path ){
-    printf( "|" );
+void fpretty_print( FILE * stream, int rows, int cols, char ** path ){
+    fprintf( stream, "|" );
     for( int i = 0; i < cols * 2 + 1; i++ ){
-        printf( "-" );
+        fprintf( stream, "-" );
     }
-    printf( "|\n" );
-    printf( "  " );
+    fprintf( stream, "|\n" );
+    fprintf( stream, "  " );
     for( int i = 0; i < cols; i++ ){
-        printf( "%c ", path[0][i] );
+        fprintf( stream, "%c ", path[0][i] );
     }
-    printf( "|\n" );
+    fprintf( stream, "|\n" );
     for( int i = 1; i < rows - 1; i++ ){
-        printf( "| " );
+        fprintf( stream, "| " );
         for( int j = 0; j < cols; j++ ){
-            printf( "%c ", path[i][j] );
+            fprintf( stream, "%c ", path[i][j] );
         }
-        printf( "|\n" );
+        fprintf( stream, "|\n" );
     }
-    printf( "| " );
+    fprintf( stream, "| " );
     for( int i = 0; i < cols; i++ ){
-        printf( "%c ", path[rows - 1][i] );
+        fprintf( stream, "%c ", path[rows - 1][i] );
     }
-    printf( " \n" );
-    printf( "|" );
+    fprintf( stream, " \n" );
+    fprintf( stream, "|" );
     for( int i = 0; i < cols * 2 + 1; i++ ){
-        printf( "-" );
+        fprintf( stream, "-" );
     }
-    printf( "|\n" );
+    fprintf( stream, "|\n" );
 }
 
