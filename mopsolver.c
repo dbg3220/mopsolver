@@ -68,6 +68,7 @@ Cell create_cell( unsigned short row, unsigned short column, Cell ancestor ){
 /// @return The amount of moves taken to solve the maze, -1 if a solution does
 ///  not exist
 int solve( int rows, int cols, char ** maze ){
+    int steps = 0;
     bool ** visited;
     visited = (bool**)malloc( sizeof( bool* ) * rows );
     for( int i = 0; i < rows; i++ ){
@@ -125,28 +126,27 @@ int solve( int rows, int cols, char ** maze ){
         }
     }
     if( solution != NULL ){
-        int steps = 0;
         Cell current = solution;
         while( current != NULL ){
            maze[current->row][current->column] = PASSED; 
            current = current->ancestor;
            steps++;
         }
-        while( !que_empty( queue ) ){
-            Cell cell = (Cell)que_remove( queue );
-            free( cell );
-        }
-        que_destroy( queue );
-        while( !que_empty( processed_cells ) ){
-            Cell cell = (Cell)que_remove( processed_cells );
-            free( cell );
-        }
-        que_destroy( processed_cells );
-        destroy_matrix( rows, (void**)visited );
-        return steps;      
     }else{
-        return -1;
+        steps = -1; 
     }
+    while( !que_empty( queue ) ){
+        Cell cell = (Cell)que_remove( queue );
+        free( cell );
+    }
+    que_destroy( queue );
+    while( !que_empty( processed_cells ) ){
+        Cell cell = (Cell)que_remove( processed_cells );
+        free( cell );
+    }
+    que_destroy( processed_cells );
+    destroy_matrix( rows, (void**)visited );
+    return steps;
 }
 
 /// Counts the number of 0s or 1s in a single string and gives that value
