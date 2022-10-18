@@ -1,0 +1,83 @@
+commit e02eebe6e5c2de7ad7f1574cfb2ad448cd74dbe6
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Fri Apr 15 11:43:04 2022 -0400
+
+    Fixed error that only freed memory if a solution was found
+
+commit 8be613d8e70787701c877f11217642a48a6d839d
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Mon Apr 4 12:49:43 2022 -0400
+
+    Modified all modules to print output to any specified stream
+
+commit 4e156ff28f0195f0183281a79a270f767c2168d5
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Sat Apr 2 12:26:38 2022 -0400
+
+    Fixed small bug in BFS algorithm in solve() function
+
+commit a1dd3ed73e33d0193503a620e7e8a6dfacc2700f
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Sun Mar 27 04:24:12 2022 -0400
+
+    Made solve function more memory efficient, program is now fully functional but ineffective at large mazes
+
+commit 81d4b9d0026788582095881aa4832b186c70e287
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Fri Mar 25 17:59:01 2022 -0400
+
+    Made parse function more efficient by using realloc to create a 2D array
+
+commit 51653eb92d508fd5da7f876d59f26df5a62b3579
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Thu Mar 24 17:13:16 2022 -0400
+
+    Implemented breadth-first search in the solve function
+
+commit 24761869f7ee1cb6a393d708413a8d7fdcb005cc
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Thu Mar 24 17:11:11 2022 -0400
+
+    Optimized error message functions to print the help message to an output stream given as an argument
+
+commit be9cb4a5a991be4e7e01a5c8574c5e9bf4e73447
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Mon Mar 14 11:27:20 2022 -0400
+
+    Added documentation and made non-existent files non-openable
+
+commit 4a45db5806337f03b7075d890fa2b25b012282cc
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Mon Mar 14 11:06:07 2022 -0400
+
+    Implemented function to pretty print mazes given a char matrices
+
+commit 65992917c8f201cfcd4d1b61bf08838c9c029bd3
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Fri Mar 11 18:14:09 2022 -0500
+
+    Program can now open and close provided files and default to stdin, stdout if none are provided
+
+commit 2b804b993a4a1befe2061c238f764f298b5c8353
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Thu Mar 10 12:13:05 2022 -0500
+
+    Command line options are now parsed correctly
+
+commit ea00a34082f7f4a09e8ea80eb6f1ce276fc8e206
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Wed Mar 9 15:48:06 2022 -0500
+
+    Created header and source files to print help messages to stdout and stderr
+
+commit 1bd4afd3c4bb12e8c331b3374ce4b8b2ec1001df
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Wed Mar 9 15:47:30 2022 -0500
+
+    Parsed all command line arguments correctly
+
+commit c11d7eeb210e0ba1cd4b04463f46ee693c273813
+Author: dbg3220 <dbg3220@rit.edu>
+Date:   Tue Mar 8 13:28:12 2022 -0500
+
+    mopsolver.c created and given a main function with documentation
