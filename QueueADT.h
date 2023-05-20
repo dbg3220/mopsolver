@@ -3,6 +3,7 @@
 // Description:  Interface to the QueueADT module
 //
 // Author:  CS@RIT.EDU
+// Author:  Damon Gonzalez
 //
 
 #ifndef _QUEUEADT_H_
@@ -27,26 +28,11 @@ typedef struct QueueStruct * QueueADT;
 
 #endif
 
-/// Create a QueueADT that uses the supplied function as a comparison
-/// routine.
+/// Create a fifo QueueADT.
 ///
-/// The comparison function takes two void * parameters, and returns
-/// an integer result that indicates the relationship between the
-/// two things:
-///
-///	Result	Relationship
-///	======	===========
-///	 < 0	a < b
-///	 = 0	a == b
-///	 > 0	a > b
-///
-/// where ">" and "<" are dependent upon the data being compared
-///
-/// @param cmp the address of the comparison function to be used for
-///    ordering this queue, or NULL if standard FIFO behavior is desired
 /// @return a QueueADT instance, or NULL if the allocation fails
 
-QueueADT que_create( int (*cmp)(const void * a, const void * b) );
+QueueADT que_create();
 
 
 /// Tear down and deallocate the supplied QueuADT.
@@ -63,10 +49,7 @@ void que_destroy( QueueADT queue );
 void que_clear( QueueADT queue );
 
 
-/// Insert the specified data into the Queue in the appropriate place
-///
-/// Uses the queue's comparison function to determine the appropriate
-/// place for the insertion.
+/// Enqueue an element to the end of the queue.
 ///
 /// @param queue the QueueADT into which the value is to be inserted
 /// @param data the data to be inserted
@@ -76,10 +59,10 @@ void que_clear( QueueADT queue );
 ///     printing an appropriate message to the standard error output and
 ///     then exiting with EXIT_FAILURE, or by having an assert() fail.
 
-void que_insert( QueueADT queue, void * data );
+void que_enqueue( QueueADT queue, void * data );
 
 
-/// Remove and return the first element from the QueueADT.
+/// Dequeue an element from the front of the queue.
 ///
 /// @param queue the QueueADT to be manipulated
 /// @return the value that was removed from the queue
@@ -88,16 +71,23 @@ void que_insert( QueueADT queue, void * data );
 ///     appropriate message to the standard error output and then
 ///     exiting with EXIT_FAILURE, or by having an assert() fail.
 
-void * que_remove( QueueADT queue );
+void * que_dequeue( QueueADT queue );
 
 
 /// Indicate whether or not the supplied Queue is empty
 ///
-/// @param the QueueADT to be tested
+/// @param queue - the QueueADT to be tested
 /// @return true if the queue is empty, otherwise false
 
 bool que_empty( QueueADT queue );
 
+
+/// Give the size of the queue at the current time.
+///
+/// @param queue - the QueueADT to be tested
+/// @return The number of elements in the queue
+
+int queue_size( QueueADT queue );
 
 #endif
 
