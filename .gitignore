@@ -4,5 +4,8 @@
 # Executable files on windows OS
 *.exe
 
+# IDE Configuration files
+.*
+
 revisions.txt
 mopsolver
