@@ -21,16 +21,11 @@
 
 #define BLOCKED  '#'
 #define PASSABLE '.'
-#define PASSED   '+'
-
-#define MAX_FILENAME 100
-
-/// Structure representing a cell for use in the breadth-first search algorithm
-typedef struct Cell_H {
-    struct Cell_H * ancestor;
-    unsigned short row;
-    unsigned short column;
-} * Cell;
+#define PATH     '+'
+#define UP       'U'
+#define DOWN     'D'
+#define LEFT     'L'
+#define RIGHT    'R'
 
 /// Destroys a char matrix allocated on the heap
 ///
@@ -44,19 +39,10 @@ void destroy_matrix( int rows, void ** matrix ){
     free( matrix );
 }
 
-/// Creates a Cell_H object with a given Cell_H ancestor and given coordinates and
-///  returns a pointer to it.
-///
-/// @param row  The row of the cell to create
-/// @param col  The column of the cell to create
-/// @return A pointer to the created cell
-Cell create_cell( unsigned short row, unsigned short column, Cell ancestor ){
-    Cell cell = (Cell)malloc( sizeof( struct Cell_H ) );
-    cell->ancestor = ancestor;
-    cell->row = row;
-    cell->column = column;
-    return cell;
-}
+typedef struct Cell {
+    unsigned short row;
+    unsigned short col;
+} Cell;
 
 /// Solves the maze with a breadth first search algorithm. Modifies the char
 ///  matrix given as the maze to include the solution path. Uses structs to
@@ -65,88 +51,30 @@ Cell create_cell( unsigned short row, unsigned short column, Cell ancestor ){
 /// @param rows  The amount of rows in the maze
 /// @param cols  The amount of columns in the maze
 /// @param maze  A pointer to a char matrix representing the maze
+/// @param display  true if the solver should reconstruct the path visually
 /// @return The amount of moves taken to solve the maze, -1 if a solution does
 ///  not exist
-int solve( int rows, int cols, char ** maze ){
-    int steps = 0;
-    bool ** visited;
-    visited = (bool**)malloc( sizeof( bool* ) * rows );
-    for( int i = 0; i < rows; i++ ){
-        visited[i] = (bool*)malloc( sizeof( bool ) * cols );
-    }
-    for( int i = 0; i < rows; i++ ){
-        for( int j = 0; j < cols; j++ ){
-            visited[i][j] = false;
+int solve( int rows, int cols, char ** maze, bool display ) {
+    Cell * initial = (Cell*)malloc( sizeof( struct Cell ) );//construct the initial cell
+    initial->row = 0;
+    initial->col = 0;
+    QueueADT queue = que_create();
+    que_enqueue( queue, (void*) initial );
+    while( !que_empty( queue ) ) {
+        Cell * current = que_dequeue( queue );
+        if(){//up
+
+        }
+        if(){//down
+
+        }
+        if(){//left
+
+        }
+        if(){//right
+
         }
     }
-    QueueADT processed_cells = que_create( NULL );
-    QueueADT queue = que_create( NULL );
-    if( maze[0][0] == PASSABLE ){
-        Cell entrance = create_cell( 0, 0, NULL );
-        que_enqueue( queue, entrance );
-    }
-    Cell solution = NULL;
-    while( !que_empty( queue ) ){
-        Cell current = (Cell)que_dequeue( queue );
-        que_enqueue( processed_cells, current );
-        unsigned short current_row = current->row;
-        unsigned short current_col = current->column;
-        if( current_row == rows - 1 && current_col == cols - 1 ){
-            solution = current;
-            break;
-        }
-        Cell child;
-        if( current_row != rows - 1 && 
-            !visited[current_row + 1][current_col] &&
-            maze[current_row + 1][current_col] != BLOCKED ){
-            visited[current_row + 1][current_col] = true;
-            child = create_cell( current_row + 1, current_col, current );
-            que_enqueue( queue, child );
-        }
-         if( current_col != cols - 1 &&
-            !visited[current_row][current_col + 1] &&
-            maze[current_row][current_col + 1] != BLOCKED ){
-            visited[current_row][current_col + 1] = true;
-            child = create_cell( current_row, current_col + 1, current );
-            que_enqueue( queue, child );
-        }
-        if( current_row != 0 && 
-            !visited[current_row - 1][current_col] &&
-            maze[current_row - 1][current_col] != BLOCKED ){
-            visited[current_row - 1][current_col] = true;
-            child = create_cell( current_row - 1, current_col, current );
-            que_enqueue( queue, child );
-        }
-        if( current_col != 0 && 
-            !visited[current_row][current_col - 1] &&
-            maze[current_row][current_col - 1] != BLOCKED ){
-            visited[current_row][current_col - 1] = true;
-            child = create_cell( current_row, current_col - 1, current );
-            que_enqueue( queue, child );
-        }
-    }
-    if( solution != NULL ){
-        Cell current = solution;
-        while( current != NULL ){
-           maze[current->row][current->column] = PASSED; 
-           current = current->ancestor;
-           steps++;
-        }
-    }else{
-        steps = -1; 
-    }
-    while( !que_empty( queue ) ){
-        Cell cell = (Cell)que_dequeue( queue );
-        free( cell );
-    }
-    que_destroy( queue );
-    while( !que_empty( processed_cells ) ){
-        Cell cell = (Cell)que_dequeue( processed_cells );
-        free( cell );
-    }
-    que_destroy( processed_cells );
-    destroy_matrix( rows, (void**)visited );
-    return steps;
 }
 
 /// Counts the number of 0s or 1s in a single string and gives that value
@@ -214,9 +142,9 @@ void parse( FILE * input, int * rows, int * cols, char *** maze ){
 int main( int argv, char* argc[] ){
     char * infile = NULL;
     char * outfile = NULL;
-    bool display = false;
+    bool display_original = false;
     bool path_size = false;
-    bool path = false;
+    bool display_path = false;
     int opt;
     while( ( opt = getopt( argv, argc, "hdspi:o:" ) ) != -1 ){
         switch( opt ){
@@ -224,13 +152,13 @@ int main( int argv, char* argc[] ){
                 fprint_help( stdout );
                 return EXIT_SUCCESS;
             case 'd':
-                display = true;
+                display_original = true;
                 break;
             case 's':
                 path_size = true;
                 break;
             case 'p':
-                path = true;
+                display_path = true;
                 break;
             case 'i':
                 infile = (char*)malloc( strlen( optarg ) + 1 );
@@ -269,11 +197,11 @@ int main( int argv, char* argc[] ){
     char ** maze = NULL;
     parse( input, &rows, &cols, &maze );
 
-    if( display ){
+    if( display_original ){
         fpretty_print( output, rows, cols, maze );
     }
 
-    int steps = solve( rows, cols, maze ); 
+    int steps = solve( rows, cols, maze, display_path ); 
 
     if( path_size ){
         if( steps == -1 ){
@@ -282,7 +210,7 @@ int main( int argv, char* argc[] ){
             fprintf( output, "Solution in %d steps.\n", steps );
         }
     }
-    if( path ){
+    if( display_path ){
         fpretty_print( output, rows, cols, maze );
     }
 
