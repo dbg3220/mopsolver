@@ -88,7 +88,7 @@ void * que_dequeue( QueueADT queue ){
     }
 
     void * data = queue->head->data;
-    if( queue->head == queue->back ){
+    if( queue->size == 1 ){
         free( queue->head );
         queue->head = NULL;
         queue->back = NULL;
