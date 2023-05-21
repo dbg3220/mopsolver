@@ -83,12 +83,12 @@ int solve( int rows, int cols, char ** maze ){
     QueueADT queue = que_create( NULL );
     if( maze[0][0] == PASSABLE ){
         Cell entrance = create_cell( 0, 0, NULL );
-        que_insert( queue, entrance );
+        que_enqueue( queue, entrance );
     }
     Cell solution = NULL;
     while( !que_empty( queue ) ){
-        Cell current = (Cell)que_remove( queue );
-        que_insert( processed_cells, current );
+        Cell current = (Cell)que_dequeue( queue );
+        que_enqueue( processed_cells, current );
         unsigned short current_row = current->row;
         unsigned short current_col = current->column;
         if( current_row == rows - 1 && current_col == cols - 1 ){
@@ -101,28 +101,28 @@ int solve( int rows, int cols, char ** maze ){
             maze[current_row + 1][current_col] != BLOCKED ){
             visited[current_row + 1][current_col] = true;
             child = create_cell( current_row + 1, current_col, current );
-            que_insert( queue, child );
+            que_enqueue( queue, child );
         }
          if( current_col != cols - 1 &&
             !visited[current_row][current_col + 1] &&
             maze[current_row][current_col + 1] != BLOCKED ){
             visited[current_row][current_col + 1] = true;
             child = create_cell( current_row, current_col + 1, current );
-            que_insert( queue, child );
+            que_enqueue( queue, child );
         }
         if( current_row != 0 && 
             !visited[current_row - 1][current_col] &&
             maze[current_row - 1][current_col] != BLOCKED ){
             visited[current_row - 1][current_col] = true;
             child = create_cell( current_row - 1, current_col, current );
-            que_insert( queue, child );
+            que_enqueue( queue, child );
         }
         if( current_col != 0 && 
             !visited[current_row][current_col - 1] &&
             maze[current_row][current_col - 1] != BLOCKED ){
             visited[current_row][current_col - 1] = true;
             child = create_cell( current_row, current_col - 1, current );
-            que_insert( queue, child );
+            que_enqueue( queue, child );
         }
     }
     if( solution != NULL ){
@@ -136,12 +136,12 @@ int solve( int rows, int cols, char ** maze ){
         steps = -1; 
     }
     while( !que_empty( queue ) ){
-        Cell cell = (Cell)que_remove( queue );
+        Cell cell = (Cell)que_dequeue( queue );
         free( cell );
     }
     que_destroy( queue );
     while( !que_empty( processed_cells ) ){
-        Cell cell = (Cell)que_remove( processed_cells );
+        Cell cell = (Cell)que_dequeue( processed_cells );
         free( cell );
     }
     que_destroy( processed_cells );
