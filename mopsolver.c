@@ -22,6 +22,8 @@
 #define BLOCKED  '#'
 #define PASSABLE '.'
 #define PATH     '+'
+
+// Characters to signify predecessor cells in the maze
 #define UP       'U'
 #define DOWN     'D'
 #define LEFT     'L'
@@ -39,10 +41,22 @@ void destroy_matrix( int rows, void ** matrix ){
     free( matrix );
 }
 
+/// Struct to represent a location in the maze
 typedef struct Cell {
     unsigned short row;
     unsigned short col;
 } Cell;
+
+/// Helper function to create a cell.
+/// @param row The row of the cell
+/// @param col The column of the cell
+/// @return The created cell
+Cell * create_cell( unsigned short row, unsigned short col ){
+    Cell * cell = (Cell*)malloc( sizeof( struct Cell ) );
+    cell->row = row;
+    cell->row = col;
+    return cell;
+}
 
 /// Solves the maze with a breadth first search algorithm. Modifies the char
 ///  matrix given as the maze to include the solution path. Uses structs to
@@ -55,25 +69,95 @@ typedef struct Cell {
 /// @return The amount of moves taken to solve the maze, -1 if a solution does
 ///  not exist
 int solve( int rows, int cols, char ** maze, bool display ) {
-    Cell * initial = (Cell*)malloc( sizeof( struct Cell ) );//construct the initial cell
-    initial->row = 0;
-    initial->col = 0;
-    QueueADT queue = que_create();
-    que_enqueue( queue, (void*) initial );
+    QueueADT queue = que_create();// for the BFS
+    QueueADT processed_cells = que_create();// to keep track of processed cells
+    bool solution_found = false;
+    if( maze[0][0] == PASSABLE ){
+        maze[0][0] = LEFT;
+        Cell * initial  = create_cell( 0, 0 );
+        que_enqueue( queue, (void*) initial );
+    }
     while( !que_empty( queue ) ) {
-        Cell * current = que_dequeue( queue );
-        if(){//up
+        Cell * current = (Cell*)que_dequeue( queue );
+        unsigned short current_row = current->row;
+        unsigned short current_col = current->col;
+
+        if( current_row == rows - 1 && current_col == cols - 1 ){
+            solution_found = true;
+            free( current );
+            break;
+        }
+
+        if( current_row != 0 &&
+            maze[current_row - 1][current_col] == PASSABLE ){//north
+            maze[current_row - 1][current_col] = DOWN;
+            Cell * new_cell = create_cell( current_row - 1, current_col );
+            que_enqueue( queue, (void*) new_cell );
+        }
+        if( current_row != rows - 1 &&
+            maze[current_row + 1][current_col] == PASSABLE ){//south
+            maze[current_row + 1][current_col] = UP;
+            Cell * new_cell = create_cell( current_row + 1, current_col );
+            que_enqueue( queue, (void*) new_cell );
+        }
+        if( current_col != 0 &&
+            maze[current_row][current_col - 1] == PASSABLE ){//west
+            maze[current_row][current_col - 1] = RIGHT;
+            Cell * new_cell = create_cell( current_row, current_col - 1);
+            que_enqueue( queue, (void*) new_cell );
+        }
+        if( current_col != cols - 1 &&
+            maze[current_row][current_col + 1] == PASSABLE ){//east
+            maze[current_row][current_col + 1] = LEFT;
+            Cell * new_cell = create_cell( current_row, current_col + 1 );
+            que_enqueue( queue, (void*) new_cell );
+        }
+
+        que_enqueue( processed_cells, current );
+    }
+
+    while( !que_empty( queue ) ){
+        void * data = que_dequeue( queue );
+        free( data );
+    }
+    que_destroy( queue );
+    while( !que_empty( processed_cells ) ){
+        void * data = que_dequeue( processed_cells );
+        free( data );
+    }
+    que_destroy( queue );
+
+    if( !solution_found ){
+        return -1;
+    } else {//work backwards to find the path
+        int steps = 0;
+        Cell current = { rows - 1, cols - 1 };
+        maze[current.row][current.col] = PATH;
+        while( current.row != 0 || current.col != 0 ){
+            steps++;
+            switch( maze[current.row][current.col] ){
+                case UP:
+                    current.row--;
+                    break;
+                case DOWN:
+                    current.row++;
+                    break;
+                case LEFT:
+                    current.col--;
+                    break;
+                case RIGHT:
+                    current.col++;
+                    break;
+            }
+            maze[current.row][current.col] = PATH;
+        }
+        maze[0][0] = PATH;
+
+        if( display ){// remove other characters for a clean maze path
 
         }
-        if(){//down
 
-        }
-        if(){//left
-
-        }
-        if(){//right
-
-        }
+        return steps;
     }
 }
 
