@@ -54,7 +54,7 @@ typedef struct Cell {
 Cell * create_cell( unsigned short row, unsigned short col ){
     Cell * cell = (Cell*)malloc( sizeof( struct Cell ) );
     cell->row = row;
-    cell->row = col;
+    cell->col = col;
     return cell;
 }
 
@@ -125,36 +125,46 @@ int solve( int rows, int cols, char ** maze, bool display ) {
         void * data = que_dequeue( processed_cells );
         free( data );
     }
-    que_destroy( queue );
+    que_destroy( processed_cells );
 
     if( !solution_found ){
         return -1;
     } else {//work backwards to find the path
-        int steps = 0;
+        int steps = 1;
         Cell current = { rows - 1, cols - 1 };
-        maze[current.row][current.col] = PATH;
-        while( current.row != 0 || current.col != 0 ){
+        while( !(current.row == 0 && current.col == 0) ){
             steps++;
             switch( maze[current.row][current.col] ){
                 case UP:
+                    maze[current.row][current.col] = PATH;
                     current.row--;
                     break;
                 case DOWN:
+                    maze[current.row][current.col] = PATH;
                     current.row++;
                     break;
                 case LEFT:
+                    maze[current.row][current.col] = PATH;
                     current.col--;
                     break;
                 case RIGHT:
+                    maze[current.row][current.col] = PATH;
                     current.col++;
                     break;
             }
-            maze[current.row][current.col] = PATH;
         }
         maze[0][0] = PATH;
 
         if( display ){// remove other characters for a clean maze path
-
+            for( int i = 0; i < rows; i++ ){
+                for( int j = 0; j < cols; j++){
+                    char current = maze[i][j];
+                    if( current == UP || current == DOWN ||
+                        current == LEFT || current == RIGHT ){
+                        maze[i][j] = PASSABLE;
+                    }
+                }
+            }
         }
 
         return steps;
