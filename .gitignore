@@ -7,6 +7,9 @@
 # IDE Configuration files
 .*
 
+# Large maze files
+examples/maze*
+
 # Don't ignore .gitignore
 !.gitignore
 
